@@ -1,0 +1,35 @@
+{
+    "id": "uuid-generated",
+    "name": "Sofia",
+    "age": 24,
+    "gender": "F",
+    "city": "Paris",
+    "job": "UX Designer",
+    "hobbies": [
+        "yoga",
+        "photography",
+        "cooking"
+    ],
+    "music_genres": [
+        "indie",
+        "jazz"
+    ],
+    "travel_style": "culturel",
+    "love_language": "actes de service",
+    "values": [
+        "authenticite",
+        "ambition",
+        "bienveillance"
+    ],
+    "personality": "ambivert",
+    "looking_for": "relation serieuse",
+    "red_flags": [
+        "manipulation",
+        "tabac"
+    ],
+    "wants_children": "peut-etre",
+    "humor_style": "bienveillant",
+    "attachment_style": "secure",
+    "vibe_archetype": "Soft Academia x Golden Retriever",
+    "bio": "Sofia, 24, UX designer ambivert à Paris. Cherche relation sérieuse. Yoga, photo, cuisine. Indie & jazz. Voyage culturel. Love language: actes de service. Valeurs: authenticité, ambition. Red flags: manipulation, tabac."
+}
