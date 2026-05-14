@@ -1,12 +1,12 @@
 import os
 import json
-from openai import OpenAI
+from groq import Groq
 from dotenv import load_dotenv
 from profiles import compute_compatibility
 from rag import MatchRAG
 
 load_dotenv()
-client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+client = Groq(api_key=os.getenv('GROQ_API_KEY'))
 
 # ── 3 Tools definitions — OpenAI format ───────────────────────────
 TOOLS = [
@@ -141,7 +141,7 @@ def run_agent_stream(user_message: str, history: list, user_profile: dict, rag: 
 
     for iteration in range(5):
         response = client.chat.completions.create(
-            model='gpt-4o',           # swap to 'gpt-4o-mini' for lower cost
+            model='llama-3.3-70b-versatile',  # Groq free tier
             max_tokens=2000,
             tools=TOOLS,
             tool_choice='auto',
