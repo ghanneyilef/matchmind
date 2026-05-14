@@ -1,0 +1,563 @@
+[
+  {
+    "id": "uuid-001",
+    "name": "Sofia",
+    "age": 24,
+    "gender": "femme",
+    "city": "Paris",
+    "job": "UX Designer",
+    "hobbies": [
+      "yoga",
+      "photography",
+      "cooking"
+    ],
+    "music_genres": [
+      "indie",
+      "jazz"
+    ],
+    "travel_style": "culturel",
+    "love_language": "actes de service",
+    "values": [
+      "authenticite",
+      "ambition",
+      "bienveillance"
+    ],
+    "personality": "ambivert",
+    "looking_for": "relation serieuse",
+    "red_flags": [
+      "manipulation",
+      "tabac"
+    ],
+    "wants_children": "peut-etre",
+    "attachment_style": "secure",
+    "vibe_archetype": "Soft Academia x Golden Retriever",
+    "netflix_show": "Bridgerton",
+    "romance_trope": "friends-to-lovers",
+    "social_style": "cozy cafe",
+    "communication_style": "texting",
+    "fav_foods": [
+      "sushi",
+      "pasta"
+    ],
+    "food_dealbreaker": "tripes",
+    "relationship_dealbreaker": "manque de communication",
+    "ideal_first_date": "pique-nique au coucher du soleil avec bonne musique",
+    "confession": "je parle a mes plantes et je leur donne des prenoms",
+    "bio": "Sofia, 24, femme, UX designer ambivert. Seeking serious relationship. Hobbies: yoga, photography, cooking. Music: indie, jazz. Cultural travel. Love language: acts of service. Values: authenticity, ambition, kindness. Red flags: manipulation, smoking. Romance style: friends-to-lovers. Social style: cozy cafe. Communication: texting. Favourite food: sushi, pasta. Food dealbreaker: tripes. Vibe: Soft Academia x Golden Retriever. Attachment: secure."
+  },
+  {
+    "id": "uuid-002",
+    "name": "Karim",
+    "age": 27,
+    "gender": "homme",
+    "city": "Paris",
+    "job": "Software Engineer",
+    "hobbies": [
+      "gaming",
+      "hiking",
+      "cooking"
+    ],
+    "music_genres": [
+      "hip-hop",
+      "electronic"
+    ],
+    "travel_style": "aventure",
+    "love_language": "quality time",
+    "values": [
+      "ambition",
+      "loyalty",
+      "humour"
+    ],
+    "personality": "ambivert",
+    "looking_for": "relation serieuse",
+    "red_flags": [
+      "dishonesty",
+      "laziness"
+    ],
+    "wants_children": "oui",
+    "attachment_style": "secure",
+    "vibe_archetype": "Calm Introvert x Ambitious",
+    "netflix_show": "Black Mirror",
+    "romance_trope": "enemies-to-lovers",
+    "social_style": "cozy cafe",
+    "communication_style": "voice notes",
+    "fav_foods": [
+      "tacos",
+      "ramen"
+    ],
+    "food_dealbreaker": "foie gras",
+    "relationship_dealbreaker": "manque de respect",
+    "ideal_first_date": "randonnee suivie d un bon resto local",
+    "confession": "je pleure devant les films d animation",
+    "bio": "Karim, 27, homme, software engineer ambivert. Seeking serious relationship. Hobbies: gaming, hiking, cooking. Music: hip-hop, electronic. Adventure travel. Love language: quality time. Values: ambition, loyalty, humour. Red flags: dishonesty, laziness. Romance style: enemies-to-lovers. Social style: cozy cafe. Communication: voice notes. Favourite food: tacos, ramen. Food dealbreaker: foie gras. Vibe: Calm Introvert x Ambitious. Attachment: secure."
+  },
+  {
+    "id": "uuid-003",
+    "name": "Lena",
+    "age": 23,
+    "gender": "femme",
+    "city": "Lyon",
+    "job": "Graphic Designer",
+    "hobbies": [
+      "painting",
+      "reading",
+      "yoga"
+    ],
+    "music_genres": [
+      "indie",
+      "classical"
+    ],
+    "travel_style": "culturel",
+    "love_language": "words of affirmation",
+    "values": [
+      "creativity",
+      "freedom",
+      "authenticity"
+    ],
+    "personality": "introverti",
+    "looking_for": "relation serieuse",
+    "red_flags": [
+      "aggression",
+      "closed-mindedness"
+    ],
+    "wants_children": "non",
+    "attachment_style": "anxious",
+    "vibe_archetype": "Dark Academia x Black Cat",
+    "netflix_show": "You",
+    "romance_trope": "enemies-to-lovers",
+    "social_style": "cozy cafe",
+    "communication_style": "texting",
+    "fav_foods": [
+      "pizza",
+      "hummus"
+    ],
+    "food_dealbreaker": "viande rouge",
+    "relationship_dealbreaker": "jalousie excessive",
+    "ideal_first_date": "visite d un musee puis cafe litteraire",
+    "confession": "j ai relit Harry Potter plus de 7 fois",
+    "bio": "Lena, 23, femme, graphic designer introvert. Seeking serious relationship. Hobbies: painting, reading, yoga. Music: indie, classical. Cultural travel. Love language: words of affirmation. Values: creativity, freedom, authenticity. Red flags: aggression, closed-mindedness. Romance style: enemies-to-lovers. Social style: cozy cafe. Communication: texting. Favourite food: pizza, hummus. Food dealbreaker: viande rouge. Vibe: Dark Academia x Black Cat. Attachment: anxious."
+  },
+  {
+    "id": "uuid-004",
+    "name": "Adam",
+    "age": 26,
+    "gender": "homme",
+    "city": "Paris",
+    "job": "Marketing Manager",
+    "hobbies": [
+      "football",
+      "travel",
+      "photography"
+    ],
+    "music_genres": [
+      "pop",
+      "rnb"
+    ],
+    "travel_style": "luxe",
+    "love_language": "gifts",
+    "values": [
+      "success",
+      "family",
+      "loyalty"
+    ],
+    "personality": "extraverti",
+    "looking_for": "mariage",
+    "red_flags": [
+      "infidelity",
+      "disrespect"
+    ],
+    "wants_children": "oui",
+    "attachment_style": "secure",
+    "vibe_archetype": "Golden Retriever x Ambitious",
+    "netflix_show": "Emily in Paris",
+    "romance_trope": "friends-to-lovers",
+    "social_style": "clubbing",
+    "communication_style": "texting",
+    "fav_foods": [
+      "steak",
+      "sushi"
+    ],
+    "food_dealbreaker": "cuisine trop epice",
+    "relationship_dealbreaker": "infidelite",
+    "ideal_first_date": "diner romantique avec vue sur la ville",
+    "confession": "je chante sous la douche comme si j etais en concert",
+    "bio": "Adam, 26, homme, marketing manager extraverti. Seeking marriage. Hobbies: football, travel, photography. Music: pop, rnb. Luxury travel. Love language: gifts. Values: success, family, loyalty. Red flags: infidelity, disrespect. Romance style: friends-to-lovers. Social style: clubbing. Communication: texting. Favourite food: steak, sushi. Food dealbreaker: cuisine trop epice. Vibe: Golden Retriever x Ambitious. Attachment: secure."
+  },
+  {
+    "id": "uuid-005",
+    "name": "Yasmine",
+    "age": 25,
+    "gender": "femme",
+    "city": "Marseille",
+    "job": "Doctor",
+    "hobbies": [
+      "running",
+      "cooking",
+      "reading"
+    ],
+    "music_genres": [
+      "jazz",
+      "classical"
+    ],
+    "travel_style": "culturel",
+    "love_language": "actes de service",
+    "values": [
+      "intelligence",
+      "kindness",
+      "family"
+    ],
+    "personality": "ambivert",
+    "looking_for": "mariage",
+    "red_flags": [
+      "tabac",
+      "irresponsibility"
+    ],
+    "wants_children": "oui",
+    "attachment_style": "secure",
+    "vibe_archetype": "Soft Academia x Caregiver",
+    "netflix_show": "Grey s Anatomy",
+    "romance_trope": "friends-to-lovers",
+    "social_style": "cozy cafe",
+    "communication_style": "voice notes",
+    "fav_foods": [
+      "couscous",
+      "sushi"
+    ],
+    "food_dealbreaker": "fast food",
+    "relationship_dealbreaker": "irresponsabilite financiere",
+    "ideal_first_date": "marche au bord de mer puis glaces",
+    "confession": "je memorise les dialogues de mes series preferees",
+    "bio": "Yasmine, 25, femme, doctor ambivert. Seeking marriage. Hobbies: running, cooking, reading. Music: jazz, classical. Cultural travel. Love language: acts of service. Values: intelligence, kindness, family. Red flags: smoking, irresponsibility. Romance style: friends-to-lovers. Social style: cozy cafe. Communication: voice notes. Favourite food: couscous, sushi. Food dealbreaker: fast food. Vibe: Soft Academia x Caregiver. Attachment: secure."
+  },
+  {
+    "id": "uuid-006",
+    "name": "Lucas",
+    "age": 28,
+    "gender": "homme",
+    "city": "Lyon",
+    "job": "Musician",
+    "hobbies": [
+      "music",
+      "skateboarding",
+      "cinema"
+    ],
+    "music_genres": [
+      "indie",
+      "rock",
+      "jazz"
+    ],
+    "travel_style": "aventure",
+    "love_language": "physical touch",
+    "values": [
+      "freedom",
+      "creativity",
+      "authenticity"
+    ],
+    "personality": "extraverti",
+    "looking_for": "casual",
+    "red_flags": [
+      "controlling",
+      "no humour"
+    ],
+    "wants_children": "non",
+    "attachment_style": "avoidant",
+    "vibe_archetype": "Chaotic Creative x Free Spirit",
+    "netflix_show": "Stranger Things",
+    "romance_trope": "enemies-to-lovers",
+    "social_style": "clubbing",
+    "communication_style": "voice notes",
+    "fav_foods": [
+      "burger",
+      "pizza"
+    ],
+    "food_dealbreaker": "olives",
+    "relationship_dealbreaker": "trop de jalousie",
+    "ideal_first_date": "concert live puis biere en terrasse",
+    "confession": "j ai peur du silence total la nuit",
+    "bio": "Lucas, 28, homme, musician extraverti. Seeking casual. Hobbies: music, skateboarding, cinema. Music: indie, rock, jazz. Adventure travel. Love language: physical touch. Values: freedom, creativity, authenticity. Red flags: controlling, no humour. Romance style: enemies-to-lovers. Social style: clubbing. Communication: voice notes. Favourite food: burger, pizza. Food dealbreaker: olives. Vibe: Chaotic Creative x Free Spirit. Attachment: avoidant."
+  },
+  {
+    "id": "uuid-007",
+    "name": "Nora",
+    "age": 22,
+    "gender": "femme",
+    "city": "Paris",
+    "job": "Student",
+    "hobbies": [
+      "dancing",
+      "fashion",
+      "travel"
+    ],
+    "music_genres": [
+      "pop",
+      "afrobeats",
+      "rnb"
+    ],
+    "travel_style": "luxe",
+    "love_language": "words of affirmation",
+    "values": [
+      "fun",
+      "loyalty",
+      "ambition"
+    ],
+    "personality": "extraverti",
+    "looking_for": "relation serieuse",
+    "red_flags": [
+      "jealousy",
+      "negativity"
+    ],
+    "wants_children": "peut-etre",
+    "attachment_style": "secure",
+    "vibe_archetype": "That Girl x Social Butterfly",
+    "netflix_show": "Sex Education",
+    "romance_trope": "friends-to-lovers",
+    "social_style": "clubbing",
+    "communication_style": "texting",
+    "fav_foods": [
+      "sushi",
+      "acai bowl"
+    ],
+    "food_dealbreaker": "abats",
+    "relationship_dealbreaker": "manque d ambition",
+    "ideal_first_date": "rooftop bar avec vue panoramique",
+    "confession": "je fais des listes pour absolument tout",
+    "bio": "Nora, 22, femme, student extraverti. Seeking serious relationship. Hobbies: dancing, fashion, travel. Music: pop, afrobeats, rnb. Luxury travel. Love language: words of affirmation. Values: fun, loyalty, ambition. Red flags: jealousy, negativity. Romance style: friends-to-lovers. Social style: clubbing. Communication: texting. Favourite food: sushi, acai bowl. Food dealbreaker: abats. Vibe: That Girl x Social Butterfly. Attachment: secure."
+  },
+  {
+    "id": "uuid-008",
+    "name": "Mehdi",
+    "age": 29,
+    "gender": "homme",
+    "city": "Paris",
+    "job": "Architect",
+    "hobbies": [
+      "reading",
+      "chess",
+      "hiking"
+    ],
+    "music_genres": [
+      "classical",
+      "jazz",
+      "indie"
+    ],
+    "travel_style": "culturel",
+    "love_language": "quality time",
+    "values": [
+      "intelligence",
+      "depth",
+      "loyalty"
+    ],
+    "personality": "introverti",
+    "looking_for": "relation serieuse",
+    "red_flags": [
+      "superficiality",
+      "dishonesty"
+    ],
+    "wants_children": "peut-etre",
+    "attachment_style": "secure",
+    "vibe_archetype": "Dark Academia x Quiet Intellectual",
+    "netflix_show": "Dark",
+    "romance_trope": "friends-to-lovers",
+    "social_style": "cozy cafe",
+    "communication_style": "texting",
+    "fav_foods": [
+      "ramen",
+      "fromage"
+    ],
+    "food_dealbreaker": "fast food",
+    "relationship_dealbreaker": "superficialite",
+    "ideal_first_date": "librairie puis discussion autour d un cafe",
+    "confession": "je relis mes messages avant de les envoyer au moins 3 fois",
+    "bio": "Mehdi, 29, homme, architect introverti. Seeking serious relationship. Hobbies: reading, chess, hiking. Music: classical, jazz, indie. Cultural travel. Love language: quality time. Values: intelligence, depth, loyalty. Red flags: superficiality, dishonesty. Romance style: friends-to-lovers. Social style: cozy cafe. Communication: texting. Favourite food: ramen, fromage. Food dealbreaker: fast food. Vibe: Dark Academia x Quiet Intellectual. Attachment: secure."
+  },
+  {
+    "id": "uuid-009",
+    "name": "Chloe",
+    "age": 24,
+    "gender": "femme",
+    "city": "Bordeaux",
+    "job": "Journalist",
+    "hobbies": [
+      "writing",
+      "cinema",
+      "yoga"
+    ],
+    "music_genres": [
+      "indie",
+      "folk",
+      "pop"
+    ],
+    "travel_style": "aventure",
+    "love_language": "words of affirmation",
+    "values": [
+      "freedom",
+      "honesty",
+      "curiosity"
+    ],
+    "personality": "ambivert",
+    "looking_for": "relation serieuse",
+    "red_flags": [
+      "manipulation",
+      "arrogance"
+    ],
+    "wants_children": "non",
+    "attachment_style": "anxious",
+    "vibe_archetype": "Indie Romantic x Overthinker",
+    "netflix_show": "Fleabag",
+    "romance_trope": "enemies-to-lovers",
+    "social_style": "cozy cafe",
+    "communication_style": "voice notes",
+    "fav_foods": [
+      "pasta",
+      "cheese"
+    ],
+    "food_dealbreaker": "surimi",
+    "relationship_dealbreaker": "arrogance",
+    "ideal_first_date": "vieux marche puis film en plein air",
+    "confession": "j invente des fins alternatives aux films que je n aime pas",
+    "bio": "Chloe, 24, femme, journalist ambivert. Seeking serious relationship. Hobbies: writing, cinema, yoga. Music: indie, folk, pop. Adventure travel. Love language: words of affirmation. Values: freedom, honesty, curiosity. Red flags: manipulation, arrogance. Romance style: enemies-to-lovers. Social style: cozy cafe. Communication: voice notes. Favourite food: pasta, cheese. Food dealbreaker: surimi. Vibe: Indie Romantic x Overthinker. Attachment: anxious."
+  },
+  {
+    "id": "uuid-010",
+    "name": "Amine",
+    "age": 26,
+    "gender": "homme",
+    "city": "Paris",
+    "job": "Entrepreneur",
+    "hobbies": [
+      "gym",
+      "cooking",
+      "travel"
+    ],
+    "music_genres": [
+      "hip-hop",
+      "rnb",
+      "pop"
+    ],
+    "travel_style": "luxe",
+    "love_language": "actes de service",
+    "values": [
+      "ambition",
+      "family",
+      "success"
+    ],
+    "personality": "extraverti",
+    "looking_for": "mariage",
+    "red_flags": [
+      "laziness",
+      "dishonesty"
+    ],
+    "wants_children": "oui",
+    "attachment_style": "secure",
+    "vibe_archetype": "Sigma Grindset x Family Man",
+    "netflix_show": "Narcos",
+    "romance_trope": "friends-to-lovers",
+    "social_style": "clubbing",
+    "communication_style": "texting",
+    "fav_foods": [
+      "steak",
+      "couscous"
+    ],
+    "food_dealbreaker": "nourriture sans saveur",
+    "relationship_dealbreaker": "manque d ambition",
+    "ideal_first_date": "karting puis resto haut de gamme",
+    "confession": "je prepare mes tenues la veille comme un enfant avant l ecole",
+    "bio": "Amine, 26, homme, entrepreneur extraverti. Seeking marriage. Hobbies: gym, cooking, travel. Music: hip-hop, rnb, pop. Luxury travel. Love language: acts of service. Values: ambition, family, success. Red flags: laziness, dishonesty. Romance style: friends-to-lovers. Social style: clubbing. Communication: texting. Favourite food: steak, couscous. Food dealbreaker: nourriture sans saveur. Vibe: Sigma Grindset x Family Man. Attachment: secure."
+  },
+  {
+    "name": "ilef,22",
+    "gender": "femme",
+    "personality": "ambivert",
+    "looking_for": "casual",
+    "hobbies": "dancing",
+    "music_genres": "hard-pop,rap",
+    "netflix_show": "outbankers",
+    "romance_trope": "Enemies-to-lovers",
+    "social_style": "cozy caf� and board games ",
+    "communication_style": "voice notes",
+    "fav_foods": "pasta,nwasser",
+    "food_dealbreaker": "jeri",
+    "travel_style": "wild adventure",
+    "love_language": "acts of service",
+    "values": " ambitious",
+    "red_flags": "not funny",
+    "relationship_dealbreaker": "betrayel",
+    "ideal_first_date": "games,jumpark,activities",
+    "wants_children": "yes i want ",
+    "confession": "i never dated before ",
+    "id": "eca5bd84-9517-4030-af6c-52f584b4acdf",
+    "bio": "ilef,22. Gender: femme. Personality: ambivert. Seeking: casual. Hobbies: dancing. Music: hard-pop,rap. Netflix vibe: outbankers. Romance style: Enemies-to-lovers. Social style: cozy caf� and board games . Communication: voice notes. Favourite food: pasta,nwasser. Food dealbreaker: jeri. Travel: wild adventure. Love language: acts of service. Values:  ambitious. Red flags: not funny. Dealbreaker: betrayel. Ideal first date: games,jumpark,activities. Kids: yes i want . Secret: i never dated before ."
+  },
+  {
+    "name": "youusef,23",
+    "gender": "homme",
+    "personality": "extrovert",
+    "looking_for": "casual",
+    "hobbies": "singing",
+    "music_genres": "pop",
+    "netflix_show": "sabrina",
+    "romance_trope": "Enemies-to-lovers ",
+    "social_style": "cozy cafe",
+    "communication_style": "texting",
+    "fav_foods": "pizza",
+    "food_dealbreaker": "sea food",
+    "travel_style": "wild adventure",
+    "love_language": "gifts",
+    "values": "humour",
+    "red_flags": "betrayem",
+    "relationship_dealbreaker": "betrayel",
+    "ideal_first_date": "nature adventure",
+    "wants_children": "yes",
+    "confession": "blalala",
+    "id": "34d01a4f-53e3-431a-8a62-0fdc932b1b95",
+    "bio": "youusef,23. Gender: homme. Personality: extrovert. Seeking: casual. Hobbies: singing. Music: pop. Netflix vibe: sabrina. Romance style: Enemies-to-lovers . Social style: cozy cafe. Communication: texting. Favourite food: pizza. Food dealbreaker: sea food. Travel: wild adventure. Love language: gifts. Values: humour. Red flags: betrayem. Dealbreaker: betrayel. Ideal first date: nature adventure. Kids: yes. Secret: blalala."
+  },
+  {
+    "name": "samar,22",
+    "gender": "woman",
+    "personality": "extrovert",
+    "looking_for": "serious",
+    "hobbies": "sleeping",
+    "music_genres": "calme music",
+    "netflix_show": "from",
+    "romance_trope": "friends-to-lovers",
+    "social_style": "Clubbing and loud energy",
+    "communication_style": "texting",
+    "fav_foods": "pizza",
+    "food_dealbreaker": "rice",
+    "travel_style": "beach relaxation",
+    "love_language": "acts of service",
+    "values": "loyal",
+    "red_flags": " financially unstable",
+    "relationship_dealbreaker": "betrayel",
+    "ideal_first_date": "calme and cozy",
+    "wants_children": "yes",
+    "confession": "i have not",
+    "id": "f9d86458-b286-4125-a22d-0644999d5b52",
+    "bio": "samar,22. Gender: woman. Personality: extrovert. Seeking: serious. Hobbies: sleeping. Music: calme music. Netflix vibe: from. Romance style: friends-to-lovers. Social style: Clubbing and loud energy. Communication: texting. Favourite food: pizza. Food dealbreaker: rice. Travel: beach relaxation. Love language: acts of service. Values: loyal. Red flags:  financially unstable. Dealbreaker: betrayel. Ideal first date: calme and cozy. Kids: yes. Secret: i have not."
+  },
+  {
+    "name": "samar,22",
+    "gender": "woman",
+    "personality": "extrovert",
+    "looking_for": "serious",
+    "hobbies": "sleeping",
+    "music_genres": "electro music",
+    "netflix_show": "from",
+    "romance_trope": " friends-to-lovers",
+    "social_style": "Clubbing and loud energy",
+    "communication_style": "texting",
+    "fav_foods": "pizza",
+    "food_dealbreaker": "rice",
+    "travel_style": "beach relaxation",
+    "love_language": "acts of service",
+    "values": "financially unstable",
+    "red_flags": "financially unstable",
+    "relationship_dealbreaker": "betrayel",
+    "ideal_first_date": "calme and cozy",
+    "wants_children": "yes",
+    "confession": "i dont have",
+    "id": "325b0026-5c71-4426-ac52-2ee074623b15",
+    "bio": "samar,22. Gender: woman. Personality: extrovert. Seeking: serious. Hobbies: sleeping. Music: electro music. Netflix vibe: from. Romance style:  friends-to-lovers. Social style: Clubbing and loud energy. Communication: texting. Favourite food: pizza. Food dealbreaker: rice. Travel: beach relaxation. Love language: acts of service. Values: financially unstable. Red flags: financially unstable. Dealbreaker: betrayel. Ideal first date: calme and cozy. Kids: yes. Secret: i dont have."
+  }
+]

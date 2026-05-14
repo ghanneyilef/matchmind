@@ -1,4 +1,3 @@
-# agent.py
 import os
 import json
 from openai import OpenAI
@@ -9,7 +8,7 @@ from rag import MatchRAG
 load_dotenv()
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
-# ── 3 Tools definitions ────────────────────────────────────────────
+# ── 3 Tools definitions — OpenAI format ───────────────────────────
 TOOLS = [
     {
         "type": "function",
@@ -66,7 +65,8 @@ TOOLS = [
 
 
 # ── System prompt ──────────────────────────────────────────────────
-def build_system_prompt(user_profile: dict) -> str:
+def build_system_prompt(user_profile: dict, language: str = "en") -> str:
+    language_name = "French" if language == "fr" else "English"
     return f"""You are MatchMind 💘, a warm and witty AI dating agent for Gen Z.
 You have already completed the onboarding of the current user.
 
@@ -82,7 +82,7 @@ YOUR BEHAVIOR:
 - Never expose raw JSON to the user — translate everything into natural language.
 - Use emojis sparingly but warmly 💘
 
-LANGUAGE: Respond in the same language the user writes in.
+LANGUAGE: Respond in {language_name}. Follow the selected app language, not automatic language detection.
 """
 
 
@@ -90,7 +90,7 @@ LANGUAGE: Respond in the same language the user writes in.
 def process_tool_call(name: str, arguments: dict, rag: MatchRAG, user_profile: dict) -> str:
     if name == 'find_best_matches':
         top_k   = arguments.get('top_k', 3)
-        matches = rag.search(user_profile.get('bio', ''), top_k=top_k)
+        matches = rag.search(user_profile.get('bio', ''), top_k=top_k, user_profile=user_profile)
         return json.dumps({'matches': matches, 'count': len(matches)}, ensure_ascii=False)
 
     elif name == 'analyze_compatibility':
@@ -126,51 +126,49 @@ def process_tool_call(name: str, arguments: dict, rag: MatchRAG, user_profile: d
 
 
 # ── Main agent loop ────────────────────────────────────────────────
-def run_agent_stream(user_message: str, history: list, user_profile: dict, rag: MatchRAG):
-    """Run the agent with streaming. Yields tokens for Gradio."""
+def run_agent_stream(user_message: str, history: list, user_profile: dict, rag: MatchRAG, language: str = "en") -> str:
+    """Run the OpenAI agent loop with tool use. Returns the full response string."""
 
-    messages = [{'role': 'system', 'content': build_system_prompt(user_profile)}]
-    messages += history
+    # System message first
+    messages = [{"role": "system", "content": build_system_prompt(user_profile, language)}]
+
+    # Append conversation history (already role/content dicts)
+    for msg in history:
+        if msg.get('role') in ('user', 'assistant'):
+            messages.append({'role': msg['role'], 'content': msg['content']})
+
     messages.append({'role': 'user', 'content': user_message})
 
     for iteration in range(5):
         response = client.chat.completions.create(
-            model='gpt-4o',
-            messages=messages,
+            model='gpt-4o',           # swap to 'gpt-4o-mini' for lower cost
+            max_tokens=2000,
             tools=TOOLS,
             tool_choice='auto',
-            max_tokens=2000,
+            messages=messages,
         )
 
-        msg = response.choices[0].message
+        choice  = response.choices[0]
+        message = choice.message
 
         # ── Tool calls ─────────────────────────────────────────────
-        if msg.tool_calls:
-            messages.append(msg)
-            for tool_call in msg.tool_calls:
+        if choice.finish_reason == 'tool_calls' and message.tool_calls:
+            messages.append(message)  # assistant message with tool_calls
+
+            for tool_call in message.tool_calls:
                 name      = tool_call.function.name
                 arguments = json.loads(tool_call.function.arguments)
                 result    = process_tool_call(name, arguments, rag, user_profile)
+                print(f"🔧 Tool: {name} → {result[:120]}...")
+
                 messages.append({
                     'role':         'tool',
                     'tool_call_id': tool_call.id,
-                    'content':      result
+                    'content':      result,
                 })
             continue
 
-        # ── Final response — stream it ─────────────────────────────
-        messages.append({'role': 'assistant', 'content': msg.content})
+        # ── Final text response ────────────────────────────────────
+        return message.content or ""
 
-        stream = client.chat.completions.create(
-            model='gpt-4o',
-            messages=messages,
-            max_tokens=2000,
-            stream=True,
-        )
-        for chunk in stream:
-            token = chunk.choices[0].delta.content
-            if token:
-                yield token
-        return
-
-    yield "Sorry, I could not process your request right now 💘 Try again!"
+    return "Sorry, I could not process your request right now 💘 Try again!"
