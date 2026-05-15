@@ -459,4 +459,12 @@ with gr.Blocks() as demo:
 
     demo.load(fn=load_session, outputs=[chatbot, state, progress_text, profile_card])
 
-demo.launch(share=True, theme=Matchmind_theme, css=CSS_HEARTS)
+#demo.launch(share=True, theme=Matchmind_theme, css=CSS_HEARTS)
+app = demo
+
+if __name__ == "__main__":
+    demo.launch(
+        share=True,
+        theme=Matchmind_theme,
+        css=CSS_HEARTS
+    )
