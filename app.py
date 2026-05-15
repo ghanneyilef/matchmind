@@ -1,11 +1,9 @@
-# app.py — MatchMind UI
+# app.py — MatchMind UI (Gradio 6)
 import gradio as gr
 import json
 import uuid
 import traceback
 import os
-
-
 
 # ── Safe imports ───────────────────────────────────────────────────────────────
 try:
@@ -24,7 +22,7 @@ try:
     from i18n import LANGUAGE_OPTIONS, label_for_language, language_code, question_for, tr
     from theme import Matchmind_theme, CSS_HEARTS
 except Exception as e:
-    print(f"❌ IMPORT ERROR — theme.py: {e}"); traceback.print_exc(); raise
+    print(f"❌ IMPORT ERROR — theme/i18n: {e}"); traceback.print_exc(); raise
 
 # ── Init RAG ──────────────────────────────────────────────────────────────────
 rag = MatchRAG()
@@ -32,7 +30,6 @@ if not rag.load_index():
     path = 'data/profiles.json' if os.path.exists('data/profiles.json') else 'data/sample_profiles.json'
     profiles = load_profiles(path)
     rag.build_index(profiles)
-
 
 DEFAULT_LANGUAGE   = "en"
 DEFAULT_THEME_MODE = "light"
@@ -52,10 +49,7 @@ def theme_mode_css(mode: str = DEFAULT_THEME_MODE) -> str:
         color: #FCEAF1 !important;
         border-color: #7A2C49 !important;
     }
-    .message.bot {
-        background: #2B0F1E !important;
-        border-color: #7A2C49 !important;
-    }
+    .message.bot { background: #2B0F1E !important; border-color: #7A2C49 !important; }
     .stat-card, .quick-btn {
         background: #2B0F1E !important;
         border-color: #7A2C49 !important;
@@ -84,11 +78,8 @@ def profile_summary_html(state: dict) -> str:
     p = state.get("user_profile", {})
     if not p or not state.get("onboarding_done", False):
         return ""
-    name  = p.get('name', '?')
-    age   = p.get('age', p.get('name', '?'))   # age parsed from name answer when possible
-    city  = p.get('city', '—')
-    job   = p.get('job', p.get('looking_for', '—'))
-    bio   = p.get('bio', '')[:80]
+    name = p.get('name', '?')
+    bio  = p.get('bio', '')[:80]
     return f"""
     <div style='background:white;border:2px solid #FFC2D1;border-radius:12px;
                 padding:10px 12px;font-size:12px;color:#2D0A16;margin-top:6px;margin-bottom:8px;'>
@@ -97,36 +88,25 @@ def profile_summary_html(state: dict) -> str:
     </div>"""
 
 
-# ── Sidebar HTML (i18n) ────────────────────────────────────────────────────────
+# ── Sidebar HTML ───────────────────────────────────────────────────────────────
 def sidebar_section_html(lang: str) -> str:
-    profile_label  = tr(lang, "profile_title").upper()
-    stats_label    = tr(lang, "stats_title").upper()
-    agent_label    = tr(lang, "agent_title").upper()
-    agent_status   = tr(lang, "agent_status")
-    quick_label    = tr(lang, "quick_title").upper()
-    cands_label    = tr(lang, "stats_candidates")
-    matches_label  = tr(lang, "stats_top_matches")
-
     return f"""
     <div id="sidebar-labels">
-      <div class='sidebar-section-title'>{profile_label}</div>
+      <div class='sidebar-section-title'>{tr(lang, "profile_title").upper()}</div>
       <div style='margin-bottom:4px;'></div>
-
-      <div class='sidebar-section-title' style='margin-top:14px;'>{stats_label}</div>
+      <div class='sidebar-section-title' style='margin-top:14px;'>{tr(lang, "stats_title").upper()}</div>
       <div style='display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;margin-top:6px;'>
-        <div class='stat-card'><div class='stat-num'>{len(rag.profiles)}</div><div class='stat-lab'>{cands_label}</div></div>
-        <div class='stat-card'><div class='stat-num'>3</div><div class='stat-lab'>{matches_label}</div></div>
+        <div class='stat-card'><div class='stat-num'>{len(rag.profiles)}</div><div class='stat-lab'>{tr(lang, "stats_candidates")}</div></div>
+        <div class='stat-card'><div class='stat-num'>3</div><div class='stat-lab'>{tr(lang, "stats_top_matches")}</div></div>
       </div>
-
-      <div class='sidebar-section-title'>{agent_label}</div>
+      <div class='sidebar-section-title'>{tr(lang, "agent_title").upper()}</div>
       <div style='background:white;border:2px solid #FFC2D1;border-radius:12px;
                   padding:10px 12px;font-size:12px;color:#993556;font-weight:600;
                   margin-top:6px;margin-bottom:12px;'>
-        <span style='color:#22c55e;margin-right:5px;'>●</span>{agent_status}<br>
+        <span style='color:#22c55e;margin-right:5px;'>●</span>{tr(lang, "agent_status")}<br>
         <span style='font-size:10px;color:#C0436A;'>GPT-4o + FAISS + 3 tools</span>
       </div>
-
-      <div class='sidebar-section-title'>{quick_label}</div>
+      <div class='sidebar-section-title'>{tr(lang, "quick_title").upper()}</div>
     </div>
     """
 
@@ -155,7 +135,6 @@ def create_state():
         'onboarding_done': False,
         'language':        DEFAULT_LANGUAGE,
         'theme_mode':      DEFAULT_THEME_MODE,
-        # Gradio 6: conversation stored as [{"role": ..., "content": ...}] dicts
         'conversation':    [{"role": "assistant", "content": first_question}],
         'agent_history':   [],
     }
@@ -164,22 +143,17 @@ def create_state():
 def ensure_state(state: dict, history=None):
     if state is None:
         state = create_state()
-
     state.setdefault('user_profile', {})
     state.setdefault('onboarding_idx', 0)
     state.setdefault('onboarding_done', False)
     state['language'] = language_code(state.get('language', DEFAULT_LANGUAGE))
     state.setdefault('theme_mode', DEFAULT_THEME_MODE)
-
-    if 'conversation' not in state:
-        state['conversation'] = list(history or [])
-    if not state['conversation']:
-        state['conversation'] = [{"role": "assistant", "content": question_for(state['language'], QUESTIONS, 0)}]
-
+    if 'conversation' not in state or not state['conversation']:
+        state['conversation'] = [{"role": "assistant",
+                                   "content": question_for(state['language'], QUESTIONS, 0)}]
     if 'agent_history' not in state:
         state['agent_history'] = list(state.get('chat_history', []))
     state['chat_history'] = state['agent_history']
-
     return state
 
 
@@ -193,7 +167,6 @@ def get_progress_text(state):
 
 
 def add_exchange(history, user_message, assistant_message):
-    # Gradio 6: messages use {"role": ..., "content": ...} dicts
     history = list(history or [])
     if user_message is not None:
         history.append({"role": "user", "content": user_message})
@@ -207,25 +180,20 @@ def append_exchange(state: dict, user_message, assistant_message):
     return get_conversation(state)
 
 
+# ── Session management ─────────────────────────────────────────────────────────
 def load_session():
     state = create_state()
     return get_conversation(state), state, get_progress_text(state), ""
 
 
-# ── Session management (Step 3) ────────────────────────────────────────────────
 def reset_session(state):
-    """Start a brand-new chat session."""
     new_state = create_state()
     return get_conversation(new_state), new_state, get_progress_text(new_state), ""
 
 
 def export_json(state):
-    """Serialize conversation + profile to a downloadable JSON file."""
     state = ensure_state(state)
-    data = {
-        "profile":      state["user_profile"],
-        "conversation": state["conversation"],
-    }
+    data = {"profile": state["user_profile"], "conversation": state["conversation"]}
     path = os.path.join(os.environ.get("TEMP", os.getcwd()), "matchmind_conversation.json")
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
@@ -233,7 +201,6 @@ def export_json(state):
 
 
 def export_markdown(state):
-    """Format conversation as a Markdown report."""
     state = ensure_state(state)
     lines = ["# MatchMind Report\n"]
     for msg in state["conversation"]:
@@ -249,15 +216,12 @@ def export_markdown(state):
 def apply_language(language_label: str, state: dict):
     state = ensure_state(state)
     state['language'] = language_code(language_label)
-
     if not state.get('onboarding_done', False) and state.get('conversation'):
         idx = min(state.get('onboarding_idx', 0), len(QUESTIONS) - 1)
-        # Update the last assistant message
         state['conversation'][-1] = {
             "role": "assistant",
             "content": question_for(state['language'], QUESTIONS, idx),
         }
-
     lang = state['language']
     return (
         get_conversation(state),
@@ -281,24 +245,25 @@ def apply_theme_mode(theme_label: str, state: dict):
 
 # ── Quick actions ──────────────────────────────────────────────────────────────
 def quick_action(prompt_key: str, history: list, state: dict):
-    state = ensure_state(state, history)
-    return btn_respond(tr(state['language'], prompt_key), get_conversation(state), state)
+    if state is None:
+        state = create_state()
+    state = ensure_state(state)
+    return btn_respond(tr(state['language'], prompt_key), state)
 
 
 # ── respond ────────────────────────────────────────────────────────────────────
 def respond(message: str, history: list, state: dict):
     try:
-        state = ensure_state(state, history)
+        state = ensure_state(state)
         if not message or not message.strip():
             return "", get_conversation(state), state, get_progress_text(state), profile_summary_html(state)
 
-        # Onboarding
         if not state['onboarding_done']:
             idx = state['onboarding_idx']
             if idx >= len(QUESTIONS):
                 state['onboarding_done'] = True
                 state['user_profile'].setdefault('bio', build_bio(state['user_profile']))
-                return respond(message, get_conversation(state), state)
+                return respond(message, history, state)
 
             key = QUESTIONS[idx]['key']
             state['user_profile'][key] = message
@@ -315,8 +280,7 @@ def respond(message: str, history: list, state: dict):
             save_user_to_database(state['user_profile'])
 
             done_msg = tr(
-                state['language'],
-                "done_msg",
+                state['language'], "done_msg",
                 name=state['user_profile'].get('name', ''),
                 count=len(rag.profiles),
             )
@@ -328,31 +292,29 @@ def respond(message: str, history: list, state: dict):
         if not response:
             response = tr(state['language'], "fallback_error")
 
-        # agent_history stays as OpenAI-style dicts for run_agent_stream
-        state['agent_history'].append({"role": "user", "content": message})
-        state['agent_history'].append({"role": "assistant", "content": response})
+        state['agent_history'] = add_exchange(state['agent_history'], message, response)
         state['chat_history']  = state['agent_history']
         conversation = append_exchange(state, message, response)
         return "", conversation, state, get_progress_text(state), profile_summary_html(state)
 
     except Exception as e:
         print(f"❌ ERROR in respond: {e}"); traceback.print_exc()
-        state = ensure_state(state, history)
+        state = ensure_state(state)
         conversation = append_exchange(state, message, f"❌ Error: {e}")
         return "", conversation, state, get_progress_text(state), profile_summary_html(state)
 
 
-def btn_respond(text: str, history: list, state: dict):
+def btn_respond(text: str, state: dict):
     try:
-        state = ensure_state(state, history)
+        state = ensure_state(state)
         if not state.get('onboarding_done', False):
             append_exchange(state, None, tr(state['language'], "finish_onboarding"))
             return get_conversation(state), state, get_progress_text(state)
-        _, conversation, state, prog_text, _ = respond(text, get_conversation(state), state)
+        _, conversation, state, prog_text, _ = respond(text, [], state)
         return conversation, state, prog_text
     except Exception as e:
         print(f"❌ ERROR in btn_respond: {e}"); traceback.print_exc()
-        state = ensure_state(state, history)
+        state = ensure_state(state)
         conversation = append_exchange(state, None, f"❌ Error: {e}")
         return conversation, state, get_progress_text(state)
 
@@ -389,13 +351,11 @@ with gr.Blocks() as demo:
     </div>
     """)
 
-    # ── Body: sidebar + chat ──────────────────────────────────────────────────
     with gr.Row(equal_height=True):
 
-        # ── Sidebar ──────────────────────────────────────────────────────────
+        # ── Sidebar ───────────────────────────────────────────────────────────
         with gr.Column(scale=1, min_width=220, elem_id="sidebar"):
 
-            # Language + Theme side by side
             with gr.Row():
                 language_selector = gr.Dropdown(
                     choices=LANGUAGE_OPTIONS,
@@ -414,35 +374,22 @@ with gr.Blocks() as demo:
                     scale=2,
                 )
 
-            # i18n sidebar section labels
             sidebar_labels = gr.HTML(sidebar_section_html(DEFAULT_LANGUAGE))
+            profile_card   = gr.HTML("", elem_id="profile-card")
+            progress_text  = gr.Markdown(format_progress(create_state()), elem_classes=["progress-md"])
 
-            # Profile card (Step 4) — shows after onboarding completes
-            profile_card = gr.HTML("", elem_id="profile-card")
-
-            # Progress text
-            progress_text = gr.Markdown(
-                format_progress(create_state()),
-                elem_classes=["progress-md"],
-            )
-
-            # Quick action buttons
             btn_match  = gr.Button(tr(DEFAULT_LANGUAGE, "btn_match"),  elem_classes=["quick-btn"])
             btn_top1   = gr.Button(tr(DEFAULT_LANGUAGE, "btn_top1"),   elem_classes=["quick-btn"])
             btn_report = gr.Button(tr(DEFAULT_LANGUAGE, "btn_report"), elem_classes=["quick-btn"])
             btn_advice = gr.Button(tr(DEFAULT_LANGUAGE, "btn_advice"), elem_classes=["quick-btn"])
 
-            # Divider
             gr.HTML("<div style='border-top:1px solid #FFC2D1;margin:10px 0;'></div>")
-
-            # ── Step 3: Session management buttons ───────────────────────────
             gr.HTML("<div class='sidebar-section-title'>SESSION</div>")
 
-            btn_new_chat   = gr.Button("🔄 New Chat",      elem_classes=["quick-btn"])
-            btn_save_json  = gr.Button("💾 Save as JSON",  elem_classes=["quick-btn"])
-            btn_export_md  = gr.Button("📄 Export Report", elem_classes=["quick-btn"])
+            btn_new_chat  = gr.Button("🔄 New Chat",      elem_classes=["quick-btn"])
+            btn_save_json = gr.Button("💾 Save as JSON",  elem_classes=["quick-btn"])
+            btn_export_md = gr.Button("📄 Export Report", elem_classes=["quick-btn"])
 
-            # Hidden file output — becomes visible when export fires
             file_output = gr.File(label="Download", visible=False)
 
         # ── Chat ──────────────────────────────────────────────────────────────
@@ -490,8 +437,7 @@ with gr.Blocks() as demo:
         apply_language,
         inputs=[language_selector, state],
         outputs=[chatbot, state, progress_text, msg,
-                 btn_match, btn_top1, btn_report, btn_advice,
-                 sidebar_labels],
+                 btn_match, btn_top1, btn_report, btn_advice, sidebar_labels],
     )
 
     theme_selector.change(
@@ -502,64 +448,15 @@ with gr.Blocks() as demo:
 
     btn_outputs = [chatbot, state, progress_text]
 
-    btn_match.click(
-        lambda h, s: quick_action("quick_match_prompt",  h, s),
-        inputs=[chatbot, state], outputs=btn_outputs,
-    )
-    btn_top1.click(
-        lambda h, s: quick_action("quick_top1_prompt",   h, s),
-        inputs=[chatbot, state], outputs=btn_outputs,
-    )
-    btn_report.click(
-        lambda h, s: quick_action("quick_report_prompt", h, s),
-        inputs=[chatbot, state], outputs=btn_outputs,
-    )
-    btn_advice.click(
-        lambda h, s: quick_action("quick_advice_prompt", h, s),
-        inputs=[chatbot, state], outputs=btn_outputs,
-    )
+    btn_match.click( lambda h, s: quick_action("quick_match_prompt",  h, s), inputs=[chatbot, state], outputs=btn_outputs)
+    btn_top1.click(  lambda h, s: quick_action("quick_top1_prompt",   h, s), inputs=[chatbot, state], outputs=btn_outputs)
+    btn_report.click(lambda h, s: quick_action("quick_report_prompt", h, s), inputs=[chatbot, state], outputs=btn_outputs)
+    btn_advice.click(lambda h, s: quick_action("quick_advice_prompt", h, s), inputs=[chatbot, state], outputs=btn_outputs)
 
-    # ── Step 3: Session management events ─────────────────────────────────────
-    btn_new_chat.click(
-        reset_session,
-        inputs=[state],
-        outputs=[chatbot, state, progress_text, profile_card],
-    )
+    btn_new_chat.click( reset_session,   inputs=[state], outputs=[chatbot, state, progress_text, profile_card])
+    btn_save_json.click(export_json,     inputs=[state], outputs=[file_output]).then(lambda: gr.update(visible=True), outputs=[file_output])
+    btn_export_md.click(export_markdown, inputs=[state], outputs=[file_output]).then(lambda: gr.update(visible=True), outputs=[file_output])
 
-    btn_save_json.click(
-        export_json,
-        inputs=[state],
-        outputs=[file_output],
-    ).then(
-        lambda: gr.update(visible=True),
-        outputs=[file_output],
-    )
+    demo.load(fn=load_session, outputs=[chatbot, state, progress_text, profile_card])
 
-    btn_export_md.click(
-        export_markdown,
-        inputs=[state],
-        outputs=[file_output],
-    ).then(
-        lambda: gr.update(visible=True),
-        outputs=[file_output],
-    )
-    '''
-    demo.load(
-        fn=load_session,
-        outputs=[chatbot, state, progress_text, profile_card],
-    )
-    '''
-    demo.load(
-    fn=lambda: (
-        [{"role": "assistant", "content": QUESTIONS[0]['q']}],
-        create_state()
-    ),
-    outputs=[chatbot, state]
-)
 demo.launch(share=True, theme=Matchmind_theme, css=CSS_HEARTS)
-
-'''
-os.environ["no_proxy"] = "localhost,127.0.0.1,0.0.0.0"
-os.environ["NO_PROXY"] = "localhost,127.0.0.1,0.0.0.0"
-os.environ["GRADIO_SERVER_NAME"] = "0.0.0.0"
-'''

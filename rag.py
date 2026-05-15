@@ -56,20 +56,26 @@ class MatchRAG:
         return False
 
     def _gender_compatible(self, user: dict, candidate: dict) -> bool:
-        """Simple rule: homme matches with femme and vice versa."""
-        user_gender = user.get('gender', '').lower().strip()
-        cand_gender = candidate.get('gender', '').lower().strip()
+        """Matches male with female and vice versa — handles French and English."""
+        MALE   = {'homme', 'man', 'male', 'm', 'masculin'}
+        FEMALE = {'femme', 'woman', 'female', 'f', 'feminin'}
 
-        if not user_gender or not cand_gender:
-            return True  # no data = don't filter
+        def normalize(g: str) -> str:
+            g = g.lower().strip()
+            if g in MALE:   return 'male'
+            if g in FEMALE: return 'female'
+            # partial match — e.g. "i am a woman" or "femme/female"
+            if any(m in g for m in MALE):   return 'male'
+            if any(f in g for f in FEMALE): return 'female'
+            return 'other'
 
-        # Opposite genders only
-        if user_gender == 'homme':
-            return cand_gender == 'femme'
-        if user_gender == 'femme':
-            return cand_gender == 'homme'
+        user_gender = normalize(user.get('gender', ''))
+        cand_gender = normalize(candidate.get('gender', ''))
 
-        return True  # autre = no filter
+        if user_gender == 'other' or cand_gender == 'other':
+            return True  # non-binary / missing / unrecognized = no filter
+
+        return user_gender != cand_gender  # male ↔ female only
 
     def search(self, query_bio: str, top_k: int = 5, user_profile: dict = None) -> list:
         if self.index is None:
