@@ -94,15 +94,15 @@ LANGUAGE: Respond in {language_name}. Follow the selected app language, not auto
 """
 
 
-# ── Module-level cache to resolve placeholder IDs ─────────────────
+
 _last_matches: list[dict] = []
 
 
-# ── Tool execution ─────────────────────────────────────────────────
+
 def process_tool_call(name: str, arguments: dict, rag: MatchRAG, user_profile: dict) -> str:
     global _last_matches
 
-    # Guard: arguments may be None when Groq passes no args
+    
     arguments = arguments or {}
 
     if name == 'find_best_matches':
@@ -114,7 +114,7 @@ def process_tool_call(name: str, arguments: dict, rag: MatchRAG, user_profile: d
     elif name in ('analyze_compatibility', 'generate_match_report'):
         candidate_id = arguments.get('candidate_id', '')
 
-        # ── Resolve placeholder IDs Llama sometimes hallucinates ──
+        
         PLACEHOLDERS = {
             'best_match_id', 'candidate_id', 'example_id', 'match_id',
             'top_match_id', 'first_match_id', 'id', 'uuid', 'profile_id',
@@ -126,10 +126,10 @@ def process_tool_call(name: str, arguments: dict, rag: MatchRAG, user_profile: d
             else:
                 return json.dumps({'error': 'No matches found yet. Call find_best_matches first.'})
 
-        # Primary lookup by exact id
+        
         candidate = next((p for p in rag.profiles if p.get('id') == candidate_id), None)
 
-        # Fallback: fuzzy match by name
+        
         if not candidate:
             candidate = next(
                 (p for p in rag.profiles if candidate_id.lower() in p.get('name', '').lower()),
@@ -147,7 +147,7 @@ def process_tool_call(name: str, arguments: dict, rag: MatchRAG, user_profile: d
                 result['score_pct'] = f"{result['score']}%"
             return json.dumps(result, ensure_ascii=False)
 
-        else:  # generate_match_report
+        else:  #generate_match_report
             score_data = compute_compatibility(user_profile, candidate)
             if 'score' in score_data:
                 score_data['score_pct'] = f"{score_data['score']}%"
@@ -166,7 +166,7 @@ def process_tool_call(name: str, arguments: dict, rag: MatchRAG, user_profile: d
     return json.dumps({'error': 'Unknown tool'})
 
 
-# ── Main agent loop ────────────────────────────────────────────────
+
 def _call_groq(messages: list, use_tools: bool = True) -> object:
     """Single Groq API call, with or without tools."""
     kwargs = dict(
@@ -204,7 +204,7 @@ def run_agent_stream(
     """
     global _last_matches
 
-    # ── Build initial message list ────────────────────────────────
+    # Build initial message list
     messages: list[dict] = [
         {"role": "system", "content": build_system_prompt(user_profile, language)}
     ]
@@ -218,7 +218,7 @@ def run_agent_stream(
             response = _call_groq(messages, use_tools=True)
 
         except Exception as exc:
-            # ── Rate limit — friendly message ─────────────────────
+            
             if _is_rate_limit(exc):
                 print(f"⏳ Groq rate limit hit: {exc}")
                 return "⏳ I've reached my daily AI limit — please wait a few minutes and try again 💘"
@@ -226,7 +226,7 @@ def run_agent_stream(
             if not _is_tool_use_failed(exc):
                 raise  # unexpected error — bubble up
 
-            # ── Groq tool_use_failed fallback ─────────────────────
+            
             print(f"⚠️  Groq tool_use_failed on iteration {iteration} — using fallback")
             injected_results: list[str] = []
 
@@ -270,7 +270,7 @@ def run_agent_stream(
                 print(f"❌ Fallback no-tool call also failed: {fb_exc}")
                 return "Sorry, I could not process your request right now 💘 Try again!"
 
-        # ── Normal flow ───────────────────────────────────────────
+        
         choice  = response.choices[0]
         message = choice.message
 
@@ -295,7 +295,7 @@ def run_agent_stream(
                 })
             continue
 
-        # ── Final text response ───────────────────────────────────
+       
         return message.content or ""
 
     return "Sorry, I could not process your request right now 💘 Try again!"
