@@ -104,7 +104,7 @@ def sidebar_section_html(lang: str) -> str:
                   padding:10px 12px;font-size:12px;color:#993556;font-weight:600;
                   margin-top:6px;margin-bottom:12px;'>
         <span style='color:#22c55e;margin-right:5px;'>●</span>{tr(lang, "agent_status")}<br>
-        <span style='font-size:10px;color:#C0436A;'>GPT-4o + FAISS + 3 tools</span>
+        <span style='font-size:10px;color:#C0436A;'>gpt-4o-mini + FAISS + 3 tools</span>
       </div>
       <div class='sidebar-section-title'>{tr(lang, "quick_title").upper()}</div>
     </div>
@@ -137,6 +137,7 @@ def create_state():
         'theme_mode':      DEFAULT_THEME_MODE,
         'conversation':    [{"role": "assistant", "content": first_question}],
         'agent_history':   [],
+        'agent_session':   {},   # per-session store (replaces global _last_matches)
     }
 
 
@@ -154,6 +155,8 @@ def ensure_state(state: dict, history=None):
     if 'agent_history' not in state:
         state['agent_history'] = list(state.get('chat_history', []))
     state['chat_history'] = state['agent_history']
+    if 'agent_session' not in state:
+        state['agent_session'] = {}
     return state
 
 
@@ -183,7 +186,9 @@ def append_exchange(state: dict, user_message, assistant_message):
 # ── Session management ─────────────────────────────────────────────────────────
 def load_session():
     state = create_state()
-    return get_conversation(state), state, get_progress_text(state), ""
+    # Return the initial assistant greeting as a proper dict list
+    conv = list(state.get('conversation', []))
+    return conv, state, get_progress_text(state), ""
 
 
 def reset_session(state):
@@ -248,11 +253,11 @@ def quick_action(prompt_key: str, history: list, state: dict):
     if state is None:
         state = create_state()
     state = ensure_state(state)
-    return btn_respond(tr(state['language'], prompt_key), state)
+    return btn_respond(tr(state['language'], prompt_key), state, history)
 
 
 # ── respond ────────────────────────────────────────────────────────────────────
-def respond(message: str, history: list, state: dict):
+def respond(message: str, history, state: dict):
     try:
         state = ensure_state(state)
         if not message or not message.strip():
@@ -288,7 +293,7 @@ def respond(message: str, history: list, state: dict):
             return "", conversation, state, get_progress_text(state), profile_summary_html(state)
 
         # Matching phase
-        response = run_agent_stream(message, state['agent_history'], state['user_profile'], rag, state['language'])
+        response = run_agent_stream(message, state['agent_history'], state['user_profile'], rag, state['language'], state['agent_session'])
         if not response:
             response = tr(state['language'], "fallback_error")
 
@@ -304,13 +309,13 @@ def respond(message: str, history: list, state: dict):
         return "", conversation, state, get_progress_text(state), profile_summary_html(state)
 
 
-def btn_respond(text: str, state: dict):
+def btn_respond(text: str, state: dict, history: list = None):
     try:
         state = ensure_state(state)
         if not state.get('onboarding_done', False):
             append_exchange(state, None, tr(state['language'], "finish_onboarding"))
             return get_conversation(state), state, get_progress_text(state)
-        _, conversation, state, prog_text, _ = respond(text, [], state)
+        _, conversation, state, prog_text, _ = respond(text, history or [], state)
         return conversation, state, prog_text
     except Exception as e:
         print(f"❌ ERROR in btn_respond: {e}"); traceback.print_exc()
@@ -412,6 +417,7 @@ with gr.Blocks() as demo:
             """)
 
             chatbot = gr.Chatbot(
+                value=[],
                 label="",
                 height=460,
                 elem_id="chatbot",
@@ -428,10 +434,11 @@ with gr.Blocks() as demo:
                 send_btn = gr.Button("➤", variant="primary", scale=1, min_width=60)
 
     # ── Events ────────────────────────────────────────────────────────────────
+    empty_history = gr.State([])
     respond_outputs = [msg, chatbot, state, progress_text, profile_card]
 
-    msg.submit(respond,     inputs=[msg, chatbot, state], outputs=respond_outputs)
-    send_btn.click(respond, inputs=[msg, chatbot, state], outputs=respond_outputs)
+    msg.submit(respond,     inputs=[msg, empty_history, state], outputs=respond_outputs)
+    send_btn.click(respond, inputs=[msg, empty_history, state], outputs=respond_outputs)
 
     language_selector.change(
         apply_language,

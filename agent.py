@@ -1,14 +1,17 @@
 import os
 import json
-from groq import Groq
+from openai import OpenAI
 from dotenv import load_dotenv
 from profiles import compute_compatibility
 from rag import MatchRAG
 
 load_dotenv()
-client = Groq(api_key=os.getenv('GROQ_API_KEY'))
+client = OpenAI(
+    api_key=os.getenv('OPENAI_API_KEY'),
+    base_url="https://openrouter.ai/api/v1",
+)
 
-# ── 3 Tools definitions — OpenAI format ───────────────────────────
+# ── Tool definitions — OpenAI format ──────────────────────────────
 TOOLS = [
     {
         "type": "function",
@@ -94,46 +97,49 @@ LANGUAGE: Respond in {language_name}. Follow the selected app language, not auto
 """
 
 
-
-_last_matches: list[dict] = []
-
-
-
-def process_tool_call(name: str, arguments: dict, rag: MatchRAG, user_profile: dict) -> str:
-    global _last_matches
-
-    
+# ── Tool execution ─────────────────────────────────────────────────
+def process_tool_call(
+    name: str,
+    arguments: dict,
+    rag: MatchRAG,
+    user_profile: dict,
+    session_state: dict,          # ← per-session, replaces the old global
+) -> str:
     arguments = arguments or {}
 
     if name == 'find_best_matches':
         top_k   = int(arguments.get('top_k', 3))
-        matches = rag.search(user_profile.get('bio', ''), top_k=top_k, user_profile=user_profile)
-        _last_matches = matches  # cache for placeholder resolution
+        matches = rag.search(
+            user_profile.get('bio', ''),
+            top_k=top_k,
+            user_profile=user_profile,
+        )
+        session_state['last_matches'] = matches   # store in session, NOT a global
         return json.dumps({'matches': matches, 'count': len(matches)}, ensure_ascii=False)
 
     elif name in ('analyze_compatibility', 'generate_match_report'):
         candidate_id = arguments.get('candidate_id', '')
 
-        
         PLACEHOLDERS = {
             'best_match_id', 'candidate_id', 'example_id', 'match_id',
             'top_match_id', 'first_match_id', 'id', 'uuid', 'profile_id',
         }
         if not candidate_id or candidate_id.lower().replace('-', '_') in PLACEHOLDERS:
-            if _last_matches:
-                candidate_id = _last_matches[0].get('id', '')
+            last = session_state.get('last_matches', [])
+            if last:
+                candidate_id = last[0].get('id', '')
                 print(f"⚠️  Resolved placeholder → {candidate_id}")
             else:
                 return json.dumps({'error': 'No matches found yet. Call find_best_matches first.'})
 
-        
+        # Exact UUID match first
         candidate = next((p for p in rag.profiles if p.get('id') == candidate_id), None)
 
-        
+        # Fallback: name contains match
         if not candidate:
             candidate = next(
                 (p for p in rag.profiles if candidate_id.lower() in p.get('name', '').lower()),
-                None
+                None,
             )
 
         if not candidate:
@@ -141,13 +147,12 @@ def process_tool_call(name: str, arguments: dict, rag: MatchRAG, user_profile: d
 
         if name == 'analyze_compatibility':
             result = compute_compatibility(user_profile, candidate)
-            print(f"🔍 Compatibility raw result for {candidate_id}: {result}")
             result['candidate_name'] = candidate.get('name', 'Unknown')
             if 'score' in result:
                 result['score_pct'] = f"{result['score']}%"
             return json.dumps(result, ensure_ascii=False)
 
-        else:  #generate_match_report
+        else:  # generate_match_report
             score_data = compute_compatibility(user_profile, candidate)
             if 'score' in score_data:
                 score_data['score_pct'] = f"{score_data['score']}%"
@@ -159,18 +164,17 @@ def process_tool_call(name: str, arguments: dict, rag: MatchRAG, user_profile: d
                     f"could be a great match. Mention shared values, potential friction "
                     f"points, and suggest a creative first date idea based on their "
                     f"hobbies: {candidate.get('hobbies', [])}."
-                )
+                ),
             }
             return json.dumps(result, ensure_ascii=False)
 
     return json.dumps({'error': 'Unknown tool'})
 
 
-
-def _call_groq(messages: list, use_tools: bool = True) -> object:
-    """Single Groq API call, with or without tools."""
+# ── OpenAI API call ────────────────────────────────────────────────
+def _call_openai(messages: list, use_tools: bool = True) -> object:
     kwargs = dict(
-        model='llama-3.3-70b-versatile',
+        model='gpt-4o-mini',
         max_tokens=2000,
         messages=messages,
     )
@@ -180,31 +184,28 @@ def _call_groq(messages: list, use_tools: bool = True) -> object:
     return client.chat.completions.create(**kwargs)
 
 
-def _is_tool_use_failed(exc: Exception) -> bool:
-    """Return True if this is the Groq 'tool_use_failed' / bad-generation error."""
-    msg = str(exc)
-    return 'tool_use_failed' in msg or 'failed_generation' in msg or 'Failed to call a function' in msg
-
-
 def _is_rate_limit(exc: Exception) -> bool:
     msg = str(exc)
-    return '429' in msg or 'rate_limit_exceeded' in msg or 'rate limit' in msg.lower()
+    return '429' in msg or 'rate_limit' in msg.lower() or 'rate limit' in msg.lower()
 
 
+# ── Main agent loop ────────────────────────────────────────────────
 def run_agent_stream(
     user_message: str,
     history: list,
     user_profile: dict,
     rag: MatchRAG,
     language: str = "en",
+    agent_session: dict = None,   # ← caller passes this per-session dict
 ) -> str:
     """
-    Run the Groq agent loop with tool use.
-    Handles: tool_use_failed, rate limits, None arguments, placeholder IDs.
+    Run the OpenAI agent loop with tool use.
+    `agent_session` is a plain dict stored in Gradio state — no globals.
     """
-    global _last_matches
+    if agent_session is None:
+        agent_session = {}
 
-    # Build initial message list
+    # Build message list
     messages: list[dict] = [
         {"role": "system", "content": build_system_prompt(user_profile, language)}
     ]
@@ -213,69 +214,37 @@ def run_agent_stream(
             messages.append({'role': msg['role'], 'content': msg['content']})
     messages.append({'role': 'user', 'content': user_message})
 
-    for iteration in range(6):
+    for iteration in range(8):
         try:
-            response = _call_groq(messages, use_tools=True)
-
+            response = _call_openai(messages, use_tools=True)
         except Exception as exc:
-            
             if _is_rate_limit(exc):
-                print(f"⏳ Groq rate limit hit: {exc}")
-                return "⏳ I've reached my daily AI limit — please wait a few minutes and try again 💘"
+                print(f"⏳ OpenAI rate limit: {exc}")
+                return "⏳ I've hit my API rate limit — please wait a moment and try again 💘"
+            print(f"❌ OpenAI error: {exc}")
+            return "Sorry, I could not reach the AI right now 💘 Try again in a moment!"
 
-            if not _is_tool_use_failed(exc):
-                raise  # unexpected error — bubble up
-
-            
-            print(f"⚠️  Groq tool_use_failed on iteration {iteration} — using fallback")
-            injected_results: list[str] = []
-
-            already_have_matches = any(
-                '"matches"' in m.get('content', '') for m in messages if m.get('role') == 'tool'
-            )
-            if not already_have_matches:
-                result = process_tool_call('find_best_matches', {}, rag, user_profile)
-                injected_results.append(f"[find_best_matches result]\n{result}")
-                print(f"🔧 Fallback tool: find_best_matches → {result[:120]}...")
-
-                try:
-                    matches = json.loads(result).get('matches', [])
-                    for m in matches[:3]:
-                        cid = m.get('id')
-                        if cid:
-                            cr = process_tool_call('analyze_compatibility', {'candidate_id': cid}, rag, user_profile)
-                            injected_results.append(f"[analyze_compatibility({cid})]\n{cr}")
-                            print(f"🔧 Fallback: analyze_compatibility({cid}) → {cr[:80]}...")
-                    if matches:
-                        best_id = matches[0].get('id')
-                        if best_id:
-                            rr = process_tool_call('generate_match_report', {'candidate_id': best_id}, rag, user_profile)
-                            injected_results.append(f"[generate_match_report({best_id})]\n{rr}")
-                            print(f"🔧 Fallback: generate_match_report({best_id}) → {rr[:80]}...")
-                except Exception as inner:
-                    print(f"⚠️  Fallback tool chain error: {inner}")
-
-            fallback_context = (
-                "The following tool results were computed automatically. "
-                "Use them to give the user a warm, natural response — no raw JSON:\n\n"
-                + "\n\n".join(injected_results)
-            )
-            no_tool_messages = messages + [{"role": "system", "content": fallback_context}]
-            try:
-                fb_response = _call_groq(no_tool_messages, use_tools=False)
-                return fb_response.choices[0].message.content or ""
-            except Exception as fb_exc:
-                if _is_rate_limit(fb_exc):
-                    return "⏳ I've reached my daily AI limit — please wait a few minutes and try again 💘"
-                print(f"❌ Fallback no-tool call also failed: {fb_exc}")
-                return "Sorry, I could not process your request right now 💘 Try again!"
-
-        
         choice  = response.choices[0]
         message = choice.message
 
+        # ── Tool calls ─────────────────────────────────────────────
         if choice.finish_reason == 'tool_calls' and message.tool_calls:
-            messages.append(message)
+            # Append assistant message with tool_calls (OpenAI requires this)
+            messages.append({
+                "role":       "assistant",
+                "content":    message.content or "",
+                "tool_calls": [
+                    {
+                        "id":       tc.id,
+                        "type":     "function",
+                        "function": {
+                            "name":      tc.function.name,
+                            "arguments": tc.function.arguments,
+                        },
+                    }
+                    for tc in message.tool_calls
+                ],
+            })
 
             for tool_call in message.tool_calls:
                 name     = tool_call.function.name
@@ -285,17 +254,18 @@ def run_agent_stream(
                 except json.JSONDecodeError:
                     arguments = {}
 
-                result = process_tool_call(name, arguments, rag, user_profile)
+                result = process_tool_call(name, arguments, rag, user_profile, agent_session)
                 print(f"🔧 Tool: {name} → {result[:120]}...")
 
                 messages.append({
                     'role':         'tool',
                     'tool_call_id': tool_call.id,
+                    'name':         name,
                     'content':      result,
                 })
             continue
 
-       
+        # ── Final text response ────────────────────────────────────
         return message.content or ""
 
     return "Sorry, I could not process your request right now 💘 Try again!"
